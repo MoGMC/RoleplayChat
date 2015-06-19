@@ -1,0 +1,14 @@
+name: RoleplayChat
+main: nomarthehero.RoleplayChat
+version: 1.0
+commands:
+  roleplay:
+    description: Enable roleplay chat
+    usage: /roleplay
+    permission: roleplay.use
+    permission-message: Missing permission.
+  rp:
+    description: Enable roleplay chat
+    usage: /roleplay
+    permission: roleplay.use
+    permission-message: Missing permission.
