@@ -9,6 +9,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -62,32 +63,36 @@ public class RoleplayChat extends JavaPlugin implements Listener, CommandExecuto
 		return true;
 	}
 	
-	@EventHandler
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onChat(AsyncPlayerChatEvent e) {
 		
-		Player player = e.getPlayer();
-		
-		if (isRoleplayer(player)) {
+		if (e.isCancelled() == false) {
 			
-			String message = e.getMessage();
-			message = ChatColor.YELLOW + message;
+			Player player = e.getPlayer();
 			
-			e.setCancelled(true);
-			
-			for (String playerName : roleplayers) {
+			if (isRoleplayer(player)) {
 				
-				Bukkit.getPlayer(playerName).sendMessage(ChatColor.YELLOW + "[RP] " + player.getDisplayName() + ChatColor.YELLOW + ": " + message);
+				String message = e.getMessage();
+				message = ChatColor.YELLOW + message;
 				
-			}
-			
-			for (String playerName : staff) {
+				e.setCancelled(true);
 				
-				if (!roleplayers.contains(playerName)) {
+				for (String playerName : roleplayers) {
 					
 					Bukkit.getPlayer(playerName).sendMessage(ChatColor.YELLOW + "[RP] " + player.getDisplayName() + ChatColor.YELLOW + ": " + message);
 					
-				}			
-							
+				}
+				
+				for (String playerName : staff) {
+					
+					if (!roleplayers.contains(playerName)) {
+						
+						Bukkit.getPlayer(playerName).sendMessage(ChatColor.YELLOW + "[RP] " + player.getDisplayName() + ChatColor.YELLOW + ": " + message);
+						
+					}			
+								
+				}
+				
 			}
 			
 		}
