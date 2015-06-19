@@ -114,7 +114,11 @@ public class RoleplayChat extends JavaPlugin implements Listener, CommandExecuto
 	@EventHandler
 	public void onLeave(PlayerQuitEvent e) {
 		
-		roleplayers.remove(e.getPlayer().getName());
+		Player player = e.getPlayer();
+		
+		roleplayers.remove(player.getName());
+		
+		if (player.hasPermission("roleplay.staff")) staff.remove(player.getName());
 		
 	}
 	
