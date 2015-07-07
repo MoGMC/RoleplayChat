@@ -1,5 +1,5 @@
 name: RoleplayChat
-main: com.normarthehero.plugin.RoleplayChat
+main: com.normarthehero.plugin.RoleplayPlugin
 version: 1.0
 commands:
   roleplay:
