@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -15,7 +14,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class RoleplayChat extends JavaPlugin implements Listener, CommandExecutor {
+public class RoleplayChat extends JavaPlugin implements Listener {
 
 	// Every 5~10 min
 	// "Hey <player>, you know you're still talking in roleplay chat?" (async
@@ -26,8 +25,6 @@ public class RoleplayChat extends JavaPlugin implements Listener, CommandExecuto
 
 	public void onEnable() {
 
-		getCommand("roleplay").setExecutor(this);
-		getCommand("rp").setExecutor(this);
 		getServer().getPluginManager().registerEvents(this, this);
 
 	}
@@ -36,7 +33,7 @@ public class RoleplayChat extends JavaPlugin implements Listener, CommandExecuto
 	public boolean onCommand(CommandSender sender, Command command,
 			String label, String[] args) {
 
-		if (command.getName().equalsIgnoreCase("roleplay") || command.getName().equalsIgnoreCase("rp")) {
+		if (command.getName().equalsIgnoreCase("roleplay")) {
 
 			Player player = (Player) sender;
 			String playerName = player.getName();

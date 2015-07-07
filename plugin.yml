@@ -5,10 +5,6 @@ commands:
   roleplay:
     description: Enable roleplay chat
     usage: /roleplay
-    permission: roleplay.use
-    permission-message: Missing permission.
-  rp:
-    description: Enable roleplay chat
-    usage: /roleplay
+    aliases: [rp]
     permission: roleplay.use
     permission-message: Missing permission.
