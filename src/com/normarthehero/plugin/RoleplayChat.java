@@ -21,7 +21,6 @@ public class RoleplayChat extends JavaPlugin implements Listener {
 	// runnable)
 
 	private ArrayList<String> roleplayers = new ArrayList<String>();
-	private ArrayList<String> staff = new ArrayList<String>();
 
 	public void onEnable() {
 
@@ -35,26 +34,31 @@ public class RoleplayChat extends JavaPlugin implements Listener {
 
 		if (command.getName().equalsIgnoreCase("roleplay")) {
 
-			Player player = (Player) sender;
-			String playerName = player.getName();
+			if (sender.hasPermission("roleplay.staff")) {
 
-			if (roleplayers.contains(playerName)) {
-
-				roleplayers.remove(playerName);
-				player.sendMessage(ChatColor.YELLOW + "Disabled roleplay chat!");
-
-			} else {
-
-				roleplayers.add(playerName);
-				player.sendMessage(ChatColor.YELLOW + "Enabled roleplay chat!");
-				player.sendMessage(ChatColor.YELLOW + "Roleplayers will have a yellow chat, and their messages " + ChatColor.RED + "won't" + ChatColor.YELLOW + " be sent in global chat.");
-				player.sendMessage(ChatColor.YELLOW + "To disable it, type /roleplay again.");
+				return true;
 
 			}
 
+			if (roleplayers.contains(sender.getName())) {
+
+				roleplayers.remove(sender.getName());
+				sender.sendMessage(ChatColor.YELLOW + "Disabled roleplay chat!");
+
+			} else {
+
+				roleplayers.add(sender.getName());
+				sender.sendMessage(ChatColor.YELLOW + "Enabled roleplay chat!");
+				sender.sendMessage(ChatColor.YELLOW + "Roleplayers will have a yellow chat, and their messages " + ChatColor.RED + "won't" + ChatColor.YELLOW + " be sent in global chat.");
+				sender.sendMessage(ChatColor.YELLOW + "To disable it, type /roleplay again.");
+
+			}
+
+			return true;
+
 		}
 
-		return true;
+		return false;
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
@@ -99,7 +103,8 @@ public class RoleplayChat extends JavaPlugin implements Listener {
 		Player player = e.getPlayer();
 
 		if (player.hasPermission("roleplay.staff")) {
-			staff.add(player.getName());
+			roleplayers.add(player.getName());
+
 		}
 
 	}
