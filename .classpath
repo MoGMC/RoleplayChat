@@ -11,11 +11,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Ramon/Desktop/Coding/bukkit-1.7.9-R0.2.jar">
-		<attributes>
-			<attribute name="javadoc_location" value="http://jd.bukkit.org/apidocs/"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.m2e.MAVEN2_CLASSPATH_CONTAINER">
 		<attributes>
 			<attribute name="maven.pomderived" value="true"/>

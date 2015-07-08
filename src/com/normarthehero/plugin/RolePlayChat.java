@@ -61,6 +61,8 @@ public class RolePlayChat {
 
 		}
 
+		chatRaw(ChatColor.YELLOW + name + " has left the group.");
+
 	}
 
 	public String getName() {
@@ -85,6 +87,11 @@ public class RolePlayChat {
 
 	public void sendButton(CommandSender sender) {
 		button.send(sender);
+
+	}
+
+	public boolean isEmpty() {
+		return roleplayers.isEmpty();
 
 	}
 
