@@ -16,6 +16,8 @@ public class RolePlayChat {
 	private final String CREATOR;
 	private FancyMessage button;
 
+	private static FancyMessage whoIsMsg = new FancyMessage("Click or type ").color(ChatColor.YELLOW).then("/roleplay info who").color(ChatColor.GOLD).command("/roleplay info who").tooltip("displays who's in the chat!").then(" to list who is in that chat.").color(ChatColor.YELLOW);
+
 	public RolePlayChat(String name, String CREATOR) {
 		this.rpname = name;
 		button = new FancyMessage(name).color(ChatColor.YELLOW).command("/roleplay join " + name);
@@ -34,7 +36,41 @@ public class RolePlayChat {
 	public void chatRaw(String msg) {
 		for (String player : roleplayers) {
 			Bukkit.getPlayer(player).sendMessage(msg);
+
 		}
+
+	}
+
+	public void sendInfo(CommandSender sender) {
+		StringBuilder s = new StringBuilder(ChatColor.YELLOW.toString());
+		s.append(rpname);
+		s.append("'s information:\n");
+		s.append(" Creator: ");
+		s.append(CREATOR);
+		s.append("\n Locked: ");
+		s.append(locked);
+		s.append("\n\n ");
+		s.append(roleplayers.size());
+		s.append(" player(s) large");
+		sender.sendMessage(s.toString());
+		whoIsMsg.send(sender);
+
+	}
+
+	public void sendInfoPlayers(CommandSender sender) {
+		StringBuilder s = new StringBuilder(ChatColor.YELLOW.toString());
+
+		s.append("Players who are currently in \"");
+		s.append(rpname);
+		s.append("\":\n ");
+
+		for (String player : roleplayers) {
+			s.append(player);
+			s.append(" ");
+
+		}
+
+		sender.sendMessage(s.toString());
 
 	}
 

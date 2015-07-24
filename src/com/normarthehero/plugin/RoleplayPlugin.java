@@ -39,7 +39,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			// list all current rps
 			if (args.length == 0) {
 				sender.sendMessage(ChatColor.YELLOW + "Please specify your subcommand!");
-				sender.sendMessage(ChatColor.YELLOW + "Usage: /roleplay <subcommand> <args>. Available sub-commands: list, join, leave, create, lock, unlock. Use " + ChatColor.RED + "/roleplay join" + ChatColor.YELLOW + " by itself to list/join all chats.");
+				usage(sender);
 				return true;
 
 			}
@@ -145,6 +145,29 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 			}
 
+			if (subcmd.equals("info")) {
+				if (!roleplayers.contains(sender.getName())) {
+					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
+					return true;
+
+				}
+
+				RolePlayChat chat = getRPChat(sender.getName());
+
+				if (args.length == 2) {
+					if (args[1].equalsIgnoreCase("who")) {
+						chat.sendInfoPlayers(sender);
+						return true;
+
+					}
+				}
+
+				chat.sendInfo(sender);
+
+				return true;
+
+			}
+
 			if (subcmd.equals("create")) {
 
 				if (args.length != 2) {
@@ -191,12 +214,6 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 				RolePlayChat chat = getRPChat(sender.getName());
 
-				if (chat == null) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-play chat!");
-					return true;
-
-				}
-
 				if (!chat.getCreator().equals(sender.getName())) {
 					sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to lock the group.");
 					return true;
@@ -220,12 +237,6 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 				RolePlayChat chat = getRPChat(sender.getName());
 
-				if (chat == null) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-play chat!");
-					return true;
-
-				}
-
 				if (!chat.getCreator().equals(sender.getName())) {
 					sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to unlock the group.");
 					return true;
@@ -241,7 +252,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			}
 
 			sender.sendMessage(ChatColor.YELLOW + "Could not find the subcommand you were looking for.");
-			sender.sendMessage(ChatColor.YELLOW + "Usage: /roleplay <subcommand> <args>. Available sub-commands: list, join, leave, create, lock, unlock. Use " + ChatColor.RED + "/roleplay join" + ChatColor.YELLOW + " by itself to list/join all chats.");
+			usage(sender);
 
 			return true;
 
@@ -251,8 +262,21 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
+	public void usage(CommandSender sender) {
+		sender.sendMessage(ChatColor.YELLOW + "Usage: /roleplay <subcommand> <args>. Available sub-commands: info, join, list, create, leave, lock, unlock. Use " + ChatColor.RED + "/roleplay join" + ChatColor.YELLOW + " by itself to list/join all chats.");
+
+	}
+
 	public void removeRPer(String name, RolePlayChat chat) {
 		roleplayers.remove(name);
+
+		// this should NEVER happen.
+		if (chat == null) {
+			getLogger().severe("removeRPer screwed up. please report to the nearest telephone booth /s but seriously the chat doesn't exist so please fix it");
+			return;
+
+		}
+
 		chat.remove(name);
 
 		if (chat.isEmpty()) {
@@ -325,6 +349,14 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		}
 
+		String oMsg = e.getMessage();
+
+		if (oMsg.startsWith("-g ") || oMsg.startsWith("-G ")) {
+			e.setMessage(oMsg.replaceFirst("(?i)-g ", ""));
+			return;
+
+		}
+
 		e.setCancelled(true);
 
 		// passing the message around
@@ -348,11 +380,17 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 		msgbuilder.append(e.getPlayer().getDisplayName());
 		msgbuilder.append(ChatColor.YELLOW.toString());
 		msgbuilder.append(": ");
-		msgbuilder.append(e.getMessage());
+		msgbuilder.append(oMsg);
 
 		String msg = msgbuilder.toString();
 
 		for (String player : staff) {
+
+			if (chat.isRP(player)) {
+				continue;
+
+			}
+
 			Bukkit.getPlayer(player).sendMessage(msg);
 
 		}
@@ -389,10 +427,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		RolePlayChat chat = getRPChat(name);
 
-		if (chat != null) {
-			removeRPer(name, chat);
-
-		}
+		removeRPer(name, chat);
 
 	}
 }
