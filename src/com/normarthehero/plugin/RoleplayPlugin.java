@@ -149,6 +149,12 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 				}
 
+				if (args[1] == sender.getName()) {
+					sender.sendMessage(ChatColor.YELLOW + "You can't kick yourself!");
+					return true;
+
+				}
+
 				Player target = Bukkit.getPlayer(args[1]);
 
 				if (target == null) {
