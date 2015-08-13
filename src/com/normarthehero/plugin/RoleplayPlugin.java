@@ -1,6 +1,9 @@
 package com.normarthehero.plugin;
 
 import java.util.HashSet;
+
+import mkremins.fanciful.FancyMessage;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -305,8 +308,25 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
+	FancyMessage subcmds = new FancyMessage("Available sub-commands: ").color(ChatColor.YELLOW)
+			.then("info, ").color(ChatColor.GOLD).tooltip("gives info about the rp you're in (/rp info)")
+			.then("join, ").color(ChatColor.GOLD).tooltip("join a rp (/rp join <rp name>)")
+			.then("list, ").color(ChatColor.GOLD).tooltip("list all the current rps (/rp list)")
+			.then("create, ").color(ChatColor.GOLD).tooltip("creates a new rp (/rp create <rp name>")
+			.then("leave, ").color(ChatColor.GOLD).tooltip("leaves the rp you're in (/rp leave)")
+			.then("kick, ").color(ChatColor.GOLD).tooltip("[owner tool] kicks someone from your rp (/rp kick <player>)")
+			.then("lock, ").color(ChatColor.GOLD).tooltip("[owner tool] locks your rp so no one can join (/rp lock)")
+			.then("unlock").color(ChatColor.GOLD).tooltip("[owner tool] unlocks your rp so people can join (/rp unlock)");
+
+	FancyMessage joininfo = new FancyMessage("Use ").color(ChatColor.YELLOW)
+			.then("/roleplay join").color(ChatColor.RED).command("/roleplay join").tooltip("clicking this will list all current chats.")
+			.then(" by itself to list/join chats.").color(ChatColor.YELLOW);
+
 	public void usage(CommandSender sender) {
-		sender.sendMessage(ChatColor.YELLOW + "Usage: /roleplay <subcommand> <args>. Available sub-commands: info, join, list, create, leave, lock, unlock. Use " + ChatColor.RED + "/roleplay join" + ChatColor.YELLOW + " by itself to list/join all chats.");
+		sender.sendMessage(ChatColor.YELLOW + "Usage: " + ChatColor.GOLD + "/roleplay <subcommand> <args>");
+		subcmds.send(sender);
+		joininfo.send(sender);
+		sender.sendMessage(ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\"");
 
 	}
 
