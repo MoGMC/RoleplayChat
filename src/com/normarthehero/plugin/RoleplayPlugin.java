@@ -128,6 +128,43 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 			}
 
+			if (subcmd.equals("kick")) {
+				if (!roleplayers.contains(sender.getName())) {
+					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
+					return true;
+
+				}
+
+				if (args.length != 2) {
+					sender.sendMessage(ChatColor.YELLOW + "Please specify a player to kick!");
+					return true;
+
+				}
+
+				RolePlayChat chat = getRPChat(sender.getName());
+
+				if (chat.getCreator() != sender.getName()) {
+					sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to kick a player.");
+					return true;
+
+				}
+
+				Player target = Bukkit.getPlayer(args[1]);
+
+				if (target == null) {
+					sender.sendMessage(ChatColor.YELLOW + "Could not find player, \"" + args[1] + "\"");
+					return true;
+
+				}
+
+				chat.kick(args[1]);
+
+				target.sendMessage(ChatColor.YELLOW + "You have been kicked from " + chat.getName() + ".");
+
+				return true;
+
+			}
+
 			if (subcmd.equals("leave")) {
 				if (!roleplayers.contains(sender.getName())) {
 					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");

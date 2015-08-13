@@ -89,6 +89,13 @@ public class RolePlayChat {
 
 	}
 
+	public void kick(String name) {
+		roleplayers.remove(name);
+
+		chatRaw(ChatColor.YELLOW + name + " has been kicked from the group.");
+
+	}
+
 	public void remove(String name) {
 		roleplayers.remove(name);
 
