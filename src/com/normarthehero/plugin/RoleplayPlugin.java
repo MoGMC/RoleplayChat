@@ -21,7 +21,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	// Every 5~10 min
 	// "Hey <player>, you know you're still talking in roleplay chat?" (async
-	// runnable)
+	// runnable) wat
 
 	private HashSet<String> roleplayers = new HashSet<String>();
 	private HashSet<String> staff = new HashSet<String>();
