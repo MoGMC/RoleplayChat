@@ -16,7 +16,9 @@ public class RolePlayChat {
 	private final String CREATOR;
 	private FancyMessage button;
 
-	private static FancyMessage whoIsMsg = new FancyMessage("Click or type ").color(ChatColor.YELLOW).then("/roleplay info who").color(ChatColor.GOLD).command("/roleplay info who").tooltip("displays who's in the chat!").then(" to list who is in that chat.").color(ChatColor.YELLOW);
+	private static FancyMessage whoIsMsg = new FancyMessage("Click or type ").color(ChatColor.YELLOW)
+			.then("/roleplay info who").color(ChatColor.GOLD).command("/roleplay info who")
+			.tooltip("displays who's in the chat!").then(" to list who is in that chat.").color(ChatColor.YELLOW);
 
 	public RolePlayChat(String name, String CREATOR) {
 		this.rpname = name;

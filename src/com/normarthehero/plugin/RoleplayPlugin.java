@@ -33,33 +33,68 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
+	// TODO: seperate subcmds into classes
+
 	@Override
-	public boolean onCommand(CommandSender sender, Command command,
-			String label, String[] args) {
+	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 
-		if (command.getName().equalsIgnoreCase("roleplay")) {
+		if (!command.getName().equalsIgnoreCase("roleplay")) {
+			return false;
 
-			// list all current rps
-			if (args.length == 0) {
-				sender.sendMessage(ChatColor.YELLOW + "Please specify your subcommand!");
-				usage(sender);
+		}
+
+		// list all current rps
+		if (args.length == 0) {
+			sender.sendMessage(ChatColor.YELLOW + "Please specify your subcommand!");
+			usage(sender);
+			return true;
+
+		}
+
+		// args.length is either 1 or higher now.
+
+		String subcmd = args[0].toLowerCase();
+
+		if (subcmd.equals("list")) {
+
+			if (rps.size() == 0) {
+				sender.sendMessage(ChatColor.YELLOW
+						+ "There are no current role-playing chats. Do /roleplay create <name> to create a new one!");
 				return true;
 
 			}
 
-			// args.length is either 1 or higher now.
+			sender.sendMessage(ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
 
-			String subcmd = args[0].toLowerCase();
+			for (RolePlayChat chat : rps) {
+				chat.sendButton(sender);
 
-			if (subcmd.equals("list")) {
+			}
 
-				if (rps.size() == 0) {
-					sender.sendMessage(ChatColor.YELLOW + "There are no current role-playing chats. Do /roleplay create <name> to create a new one!");
-					return true;
+			return true;
+		}
 
-				}
+		if (subcmd.equals("join")) {
+			// should never happen if joining via list
 
-				sender.sendMessage(ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
+			if (roleplayers.contains(sender.getName())) {
+				sender.sendMessage(
+						ChatColor.YELLOW + "You're already in a role-play chat! Leave before joining a new one.");
+				return true;
+
+			}
+
+			if (rps.size() == 0) {
+				sender.sendMessage(ChatColor.YELLOW
+						+ "There are no current role-playing chats. Do /roleplay create <name> to create a new one!");
+				return true;
+
+			}
+
+			if (args.length == 1) {
+
+				sender.sendMessage(
+						ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
 
 				for (RolePlayChat chat : rps) {
 					chat.sendButton(sender);
@@ -67,266 +102,268 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 				}
 
 				return true;
+
 			}
 
-			if (subcmd.equals("join")) {
-				// should never happen if joining via list
+			// checks to see if chat exists
 
-				if (roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You're already in a role-play chat! Leave before joining a new one.");
-					return true;
+			RolePlayChat chat = getRPChatFromName(args[1]);
 
-				}
+			if (chat == null) {
+				sender.sendMessage(ChatColor.YELLOW + "The chat \"" + args[1] + "\" does not exist.");
 
-				if (rps.size() == 0) {
-					sender.sendMessage(ChatColor.YELLOW + "There are no current role-playing chats. Do /roleplay create <name> to create a new one!");
-					return true;
+				sender.sendMessage(
+						ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
 
-				}
-
-				if (args.length == 1) {
-
-					sender.sendMessage(ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
-
-					for (RolePlayChat chat : rps) {
-						chat.sendButton(sender);
-
-					}
-
-					return true;
+				for (RolePlayChat chatlist : rps) {
+					chatlist.sendButton(sender);
 
 				}
 
-				// checks to see if chat exists
+				return true;
+			}
 
-				RolePlayChat chat = getRPChatFromName(args[1]);
-
-				if (chat == null) {
-					sender.sendMessage(ChatColor.YELLOW + "The chat \"" + args[1] + "\" does not exist.");
-
-					sender.sendMessage(ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
-
-					for (RolePlayChat chatlist : rps) {
-						chatlist.sendButton(sender);
-
-					}
-
-					return true;
-				}
-
-				if (chat.isLocked()) {
-					sender.sendMessage(ChatColor.YELLOW + "This group is locked! Ask " + chat.getCreator() + " if you wish to join!");
-					return true;
-
-				}
-
-				addRPer(sender.getName());
-				chat.add(sender.getName());
-
-				sender.sendMessage(ChatColor.YELLOW + "Enabled roleplay chat!");
-				sender.sendMessage(ChatColor.YELLOW + "Roleplayers will have a yellow chat. Their messages " + ChatColor.RED + "won't" + ChatColor.YELLOW + " be sent in global chat.");
-				sender.sendMessage(ChatColor.YELLOW + "To disable it, type /roleplay leave.");
-
+			if (chat.isLocked()) {
+				sender.sendMessage(
+						ChatColor.YELLOW + "This group is locked! Ask " + chat.getCreator() + " if you wish to join!");
 				return true;
 
 			}
 
-			if (subcmd.equals("kick")) {
-				if (!roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
-					return true;
+			addRPer(sender.getName());
+			chat.add(sender.getName());
 
-				}
-
-				if (args.length != 2) {
-					sender.sendMessage(ChatColor.YELLOW + "Please specify a player to kick!");
-					return true;
-
-				}
-
-				RolePlayChat chat = getRPChat(sender.getName());
-
-				if (chat.getCreator() != sender.getName()) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to kick a player.");
-					return true;
-
-				}
-
-				if (args[1] == sender.getName()) {
-					sender.sendMessage(ChatColor.YELLOW + "You can't kick yourself!");
-					return true;
-
-				}
-
-				Player target = Bukkit.getPlayer(args[1]);
-
-				if (target == null) {
-					sender.sendMessage(ChatColor.YELLOW + "Could not find player, \"" + args[1] + "\"");
-					return true;
-
-				}
-
-				chat.kick(args[1]);
-
-				target.sendMessage(ChatColor.YELLOW + "You have been kicked from " + chat.getName() + ".");
-
-				return true;
-
-			}
-
-			if (subcmd.equals("leave")) {
-				if (!roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
-					return true;
-
-				}
-
-				RolePlayChat chat = getRPChat(sender.getName());
-
-				removeRPer(sender.getName(), chat);
-
-				sender.sendMessage(ChatColor.YELLOW + "Disabled roleplay chat!");
-
-				return true;
-
-			}
-
-			if (subcmd.equals("info")) {
-				if (!roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
-					return true;
-
-				}
-
-				RolePlayChat chat = getRPChat(sender.getName());
-
-				if (args.length == 2) {
-					if (args[1].equalsIgnoreCase("who")) {
-						chat.sendInfoPlayers(sender);
-						return true;
-
-					}
-				}
-
-				chat.sendInfo(sender);
-
-				return true;
-
-			}
-
-			if (subcmd.equals("create")) {
-
-				if (args.length != 2) {
-					sender.sendMessage(ChatColor.YELLOW + "You must specify the name of the role-play chat that you want to create! Usage: /roleplay create <name>");
-					return true;
-
-				}
-
-				if (roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You are already in a role-playing chat. Leave before creating a chat!");
-					return true;
-
-				}
-
-				if (args.length > 3) {
-					sender.sendMessage(ChatColor.YELLOW + "Sorry, but the name of your role-play chat can only be one word! (however, you could do \"unicorn_over_noodles\" or something like that)");
-					return true;
-
-				}
-
-				if (getRPChatFromName(args[1]) != null) {
-					sender.sendMessage(ChatColor.YELLOW + "A chat with that name already exists!");
-					return true;
-
-				}
-
-				RolePlayChat newChat = new RolePlayChat(args[1], sender.getName());
-
-				addRPer(sender.getName());
-				rps.add(newChat);
-
-				sender.sendMessage(ChatColor.YELLOW + "Successfully created and added you to the new role-play chat, \"" + args[1] + "\".");
-
-				return true;
-
-			}
-
-			if (subcmd.equals("lock")) {
-				if (!roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-play chat!");
-					return true;
-
-				}
-
-				RolePlayChat chat = getRPChat(sender.getName());
-
-				if (!chat.getCreator().equals(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to lock the group.");
-					return true;
-
-				}
-
-				chat.lock();
-
-				chat.chatRaw(ChatColor.YELLOW + "The group has been locked.");
-
-				return true;
-
-			}
-
-			if (subcmd.equals("unlock")) {
-				if (!roleplayers.contains(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-play chat!");
-					return true;
-
-				}
-
-				RolePlayChat chat = getRPChat(sender.getName());
-
-				if (!chat.getCreator().equals(sender.getName())) {
-					sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to unlock the group.");
-					return true;
-
-				}
-
-				chat.unlock();
-
-				chat.chatRaw(ChatColor.YELLOW + "The group has been unlocked.");
-
-				return true;
-
-			}
-
-			sender.sendMessage(ChatColor.YELLOW + "Could not find the subcommand you were looking for.");
-			usage(sender);
+			sender.sendMessage(ChatColor.YELLOW + "Enabled roleplay chat!");
+			sender.sendMessage(ChatColor.YELLOW + "Roleplayers will have a yellow chat. Their messages " + ChatColor.RED
+					+ "won't" + ChatColor.YELLOW + " be sent in global chat.");
+			sender.sendMessage(ChatColor.YELLOW + "To disable it, type /roleplay leave.");
 
 			return true;
 
 		}
 
-		return false;
+		if (subcmd.equals("kick")) {
+			if (!roleplayers.contains(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
+				return true;
+
+			}
+
+			if (args.length != 2) {
+				sender.sendMessage(ChatColor.YELLOW + "Please specify a player to kick!");
+				return true;
+
+			}
+
+			RolePlayChat chat = getRPChat(sender.getName());
+
+			if (chat.getCreator() != sender.getName()) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator()
+						+ " if you wish to kick a player.");
+				return true;
+
+			}
+
+			if (args[1] == sender.getName()) {
+				sender.sendMessage(ChatColor.YELLOW + "You can't kick yourself!");
+				return true;
+
+			}
+
+			Player target = Bukkit.getPlayer(args[1]);
+
+			if (target == null) {
+				sender.sendMessage(ChatColor.YELLOW + "Could not find player, \"" + args[1] + "\"");
+				return true;
+
+			}
+
+			chat.kick(args[1]);
+
+			target.sendMessage(ChatColor.YELLOW + "You have been kicked from " + chat.getName() + ".");
+
+			roleplayers.remove(target.getName());
+
+			return true;
+
+		}
+
+		if (subcmd.equals("leave")) {
+			if (!roleplayers.contains(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
+				return true;
+
+			}
+
+			RolePlayChat chat = getRPChat(sender.getName());
+
+			removeRPer(sender.getName(), chat);
+
+			sender.sendMessage(ChatColor.YELLOW + "Disabled roleplay chat!");
+
+			return true;
+
+		}
+
+		if (subcmd.equals("info")) {
+			if (!roleplayers.contains(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-playing chat!");
+				return true;
+
+			}
+
+			RolePlayChat chat = getRPChat(sender.getName());
+
+			if (args.length == 2) {
+				if (args[1].equalsIgnoreCase("who")) {
+					chat.sendInfoPlayers(sender);
+					return true;
+
+				}
+			}
+
+			chat.sendInfo(sender);
+
+			return true;
+
+		}
+
+		if (subcmd.equals("create")) {
+
+			if (args.length != 2) {
+				sender.sendMessage(ChatColor.YELLOW
+						+ "You must specify the name of the role-play chat that you want to create! Usage: /roleplay create <name>");
+				return true;
+
+			}
+
+			if (roleplayers.contains(sender.getName())) {
+				sender.sendMessage(
+						ChatColor.YELLOW + "You are already in a role-playing chat. Leave before creating a chat!");
+				return true;
+
+			}
+
+			if (args.length > 3) {
+				sender.sendMessage(ChatColor.YELLOW
+						+ "Sorry, but the name of your role-play chat can only be one word! (however, you could do \"unicorn_over_noodles\" or something like that)");
+				return true;
+
+			}
+
+			if (getRPChatFromName(args[1]) != null) {
+				sender.sendMessage(ChatColor.YELLOW + "A chat with that name already exists!");
+				return true;
+
+			}
+
+			RolePlayChat newChat = new RolePlayChat(args[1], sender.getName());
+
+			addRPer(sender.getName());
+			rps.add(newChat);
+
+			sender.sendMessage(ChatColor.YELLOW + "Successfully created and added you to the new role-play chat, \""
+					+ args[1] + "\".");
+
+			return true;
+
+		}
+
+		if (subcmd.equals("lock")) {
+			if (!roleplayers.contains(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-play chat!");
+				return true;
+
+			}
+
+			RolePlayChat chat = getRPChat(sender.getName());
+
+			if (!chat.getCreator().equals(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator()
+						+ " if you wish to lock the group.");
+				return true;
+
+			}
+
+			chat.lock();
+
+			chat.chatRaw(ChatColor.YELLOW + "The group has been locked.");
+
+			return true;
+
+		}
+
+		if (subcmd.equals("unlock")) {
+			if (!roleplayers.contains(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't in a role-play chat!");
+				return true;
+
+			}
+
+			RolePlayChat chat = getRPChat(sender.getName());
+
+			if (!chat.getCreator().equals(sender.getName())) {
+				sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator()
+						+ " if you wish to unlock the group.");
+				return true;
+
+			}
+
+			chat.unlock();
+
+			chat.chatRaw(ChatColor.YELLOW + "The group has been unlocked.");
+
+			return true;
+
+		}
+
+		if (subcmd.equals("spy")) {
+
+			if (!sender.hasPermission("roleplay.staff")) {
+				sender.sendMessage(ChatColor.YELLOW + "Nice try, space cowboy.");
+				return true;
+
+			}
+
+			if (staff.contains(sender.getName())) {
+				staff.remove(sender.getName());
+
+			} else {
+				staff.add(sender.getName());
+
+			}
+
+			return true;
+
+		}
+
+		sender.sendMessage(ChatColor.YELLOW + "Could not find the subcommand you were looking for.");
+		usage(sender);
+
+		return true;
 
 	}
 
-	FancyMessage subcmds = new FancyMessage("Available sub-commands: ").color(ChatColor.YELLOW)
-			.then("info, ").color(ChatColor.GOLD).tooltip("gives info about the rp you're in (/rp info)")
-			.then("join, ").color(ChatColor.GOLD).tooltip("join a rp (/rp join <rp name>)")
-			.then("list, ").color(ChatColor.GOLD).tooltip("list all the current rps (/rp list)")
-			.then("create, ").color(ChatColor.GOLD).tooltip("creates a new rp (/rp create <rp name>")
-			.then("leave, ").color(ChatColor.GOLD).tooltip("leaves the rp you're in (/rp leave)")
-			.then("kick, ").color(ChatColor.GOLD).tooltip("[owner tool] kicks someone from your rp (/rp kick <player>)")
-			.then("lock, ").color(ChatColor.GOLD).tooltip("[owner tool] locks your rp so no one can join (/rp lock)")
-			.then("unlock").color(ChatColor.GOLD).tooltip("[owner tool] unlocks your rp so people can join (/rp unlock)");
+	FancyMessage subcmds = new FancyMessage("Available sub-commands: ").color(ChatColor.YELLOW).then("info, ")
+			.color(ChatColor.GOLD).tooltip("gives info about the rp you're in (/rp info)").then("join, ")
+			.color(ChatColor.GOLD).tooltip("join a rp (/rp join <rp name>)").then("list, ").color(ChatColor.GOLD)
+			.tooltip("list all the current rps (/rp list)").then("create, ").color(ChatColor.GOLD)
+			.tooltip("creates a new rp (/rp create <rp name>").then("leave, ").color(ChatColor.GOLD)
+			.tooltip("leaves the rp you're in (/rp leave)").then("kick, ").color(ChatColor.GOLD)
+			.tooltip("[owner tool] kicks someone from your rp (/rp kick <player>)").then("lock, ").color(ChatColor.GOLD)
+			.tooltip("[owner tool] locks your rp so no one can join (/rp lock)").then("unlock").color(ChatColor.GOLD)
+			.tooltip("[owner tool] unlocks your rp so people can join (/rp unlock)");
 
-	FancyMessage joininfo = new FancyMessage("Use ").color(ChatColor.YELLOW)
-			.then("/roleplay join").color(ChatColor.RED).command("/roleplay join").tooltip("clicking this will list all current chats.")
+	FancyMessage joininfo = new FancyMessage("Use ").color(ChatColor.YELLOW).then("/roleplay join").color(ChatColor.RED)
+			.command("/roleplay join").tooltip("clicking this will list all current chats.")
 			.then(" by itself to list/join chats.").color(ChatColor.YELLOW);
 
 	public void usage(CommandSender sender) {
 		sender.sendMessage(ChatColor.YELLOW + "Usage: " + ChatColor.GOLD + "/roleplay <subcommand> <args>");
 		subcmds.send(sender);
 		joininfo.send(sender);
-		sender.sendMessage(ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\"");
+		sender.sendMessage(ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED
+				+ "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\"");
 
 	}
 
@@ -335,7 +372,8 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		// this should NEVER happen.
 		if (chat == null) {
-			getLogger().severe("removeRPer screwed up. please report to the nearest telephone booth /s but seriously the chat doesn't exist so please fix it");
+			getLogger().severe(
+					"removeRPer screwed up. please report to the nearest telephone booth /s but seriously the chat doesn't exist so please fix it");
 			return;
 
 		}
@@ -462,15 +500,11 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
+	// TODO: add staff storage for spy toggle
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 
 		Player player = e.getPlayer();
-
-		if (player.hasPermission("roleplay.staff")) {
-			staff.add(player.getName());
-
-		}
 
 	}
 
