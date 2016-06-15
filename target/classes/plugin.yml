@@ -1,0 +1,9 @@
+name: RoleplayChat
+main: com.normarthehero.plugin.RoleplayPlugin
+version: 0.3
+commands:
+  roleplay:
+    description: Roleplay with friends!
+    usage: /roleplay <...>
+    aliases: [rp]
+    permission: roleplay.use
