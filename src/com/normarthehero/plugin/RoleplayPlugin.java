@@ -340,7 +340,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		}
 
-		FancyMessage subcmds = new FancyMessage("Available sub-commands: ").color(ChatColor.YELLOW).then("info, ").color(ChatColor.GOLD).tooltip("gives info about the rp you're in (/rp info)").then("join, ").color(ChatColor.GOLD).tooltip("join a rp (/rp join <rp name>)").then("list, ").color(ChatColor.GOLD).tooltip("list all the current rps (/rp list)").then("create, ").color(ChatColor.GOLD).tooltip("creates a new rp (/rp create <rp name>").then("leave, ").color(ChatColor.GOLD).tooltip("leaves the rp you're in (/rp leave)").then("kick, ").color(ChatColor.GOLD).tooltip("[owner tool] kicks someone from your rp (/rp kick <player>)").then("lock, ").color(ChatColor.GOLD).tooltip("[owner tool] locks your rp so no one can join (/rp lock)").then("unlock").color(ChatColor.GOLD).tooltip("[owner tool] unlocks your rp so people can join (/rp unlock)");
+		FancyMessage subcmds = new FancyMessage("Available sub-commands: ").color(ChatColor.YELLOW).then("info, ").color(ChatColor.GOLD).tooltip("gives info about the rp you're in (/rp info)").then("join, ").color(ChatColor.GOLD).tooltip("join a rp (/rp join <rp name>)").then("list, ").color(ChatColor.GOLD).tooltip("list all the current rps (/rp list)").then("create, ").color(ChatColor.GOLD).tooltip("creates a new rp (/rp create <rp name>)").then("leave, ").color(ChatColor.GOLD).tooltip("leaves the rp you're in (/rp leave)").then("kick, ").color(ChatColor.GOLD).tooltip("[owner tool] kicks someone from your rp (/rp kick <player>)").then("lock, ").color(ChatColor.GOLD).tooltip("[owner tool] locks your rp so no one can join (/rp lock)").then("unlock").color(ChatColor.GOLD).tooltip("[owner tool] unlocks your rp so people can join (/rp unlock)");
 
 		FancyMessage joininfo = new FancyMessage("Use ").color(ChatColor.YELLOW).then("/roleplay join").color(ChatColor.RED).command("/roleplay join").tooltip("clicking this will list all current chats.").then(" by itself to list/join chats.").color(ChatColor.YELLOW);
 
@@ -349,30 +349,6 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			subcmds.send(sender);
 			joininfo.send(sender);
 			sender.sendMessage(ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\"");
-
-		}
-
-		// gets chat that player is in
-		public RoleplayChat getChat(UUID uuid) {
-			return roleplays.get(roleplayers.get(uuid));
-
-		}
-
-		public void addRPer(UUID uuid, String chat) {
-			roleplayers.put(uuid, chat);
-
-		}
-
-		boolean isInRp(Player player) {
-
-			if (roleplayers.containsKey(player.getUniqueId())) {
-					return true;
-
-			}
-
-			player.sendMessage(ChatColor.YELLOW + "You aren't in a roleplaying chat!");
-
-			return false;
 
 		}
 
@@ -457,6 +433,30 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		}
 
+		// gets chat that player is in
+		public RoleplayChat getChat(UUID uuid) {
+			return roleplays.get(roleplayers.get(uuid));
+
+		}
+
+		public void addRPer(UUID uuid, String chat) {
+			roleplayers.put(uuid, chat);
+
+		}
+
+		boolean isInRp(Player player) {
+
+			if (roleplayers.containsKey(player.getUniqueId())) {
+					return true;
+
+			}
+
+			player.sendMessage(ChatColor.YELLOW + "You aren't in a roleplaying chat!");
+
+			return false;
+
+		}
+
 		public void enableSpy(UUID uuid) {
 
 			database.setData(uuid, SPY_KEY, "true");
@@ -501,6 +501,11 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			chat.remove(uuid);
 
 			roleplayers.remove(uuid);
+
+			if (chat.isEmpty()) {
+					roleplays.remove(chat.getName());
+
+			}
 
 		}
 
