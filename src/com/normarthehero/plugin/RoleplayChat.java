@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -45,7 +46,8 @@ public class RoleplayChat {
 			s.append(rpname);
 			s.append("'s information:\n");
 			s.append(" Creator: ");
-			s.append(getCreator());
+			s.append(getDisplayCreator());
+			s.append(ChatColor.YELLOW.toString());
 			s.append("\n Locked: ");
 			s.append(locked);
 			s.append("\n\n ");
@@ -78,15 +80,20 @@ public class RoleplayChat {
 
 		}
 
-		public String getCreator() {
+		public UUID getCreator() {
+			return CREATOR;
 
-			Player player = Bukkit.getPlayer(CREATOR);
+		}
 
-			if (player == null) {
-					return "Offline";
+		public String getDisplayCreator() {
+
+			OfflinePlayer player = Bukkit.getOfflinePlayer(CREATOR);
+
+			if (player.isOnline()) {
+					return ((Player) player).getDisplayName() + ChatColor.GREEN + " (Online)";
 
 			} else {
-					return player.getDisplayName();
+					return player.getName() + ChatColor.RED + " (Offline)";
 
 			}
 

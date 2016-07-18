@@ -66,7 +66,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			if (subcmd.equals("list")) {
 
 					if (roleplays.values().size() == 0) {
-						sender.sendMessage(ChatColor.YELLOW + "There are currently no role-playing chats. Do " + ChatColor.WHITE + "/roleplay create <name>" + ChatColor.YELLOW + " to create a new one!");
+						sender.sendMessage(ChatColor.YELLOW + "There are currently no role-playing chats. Do " + ChatColor.GOLD + "/roleplay create <name>" + ChatColor.YELLOW + " to create a new one!");
 						return true;
 
 					}
@@ -94,7 +94,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 					}
 
 					if (roleplays.size() == 0) {
-						sender.sendMessage(ChatColor.YELLOW + "There are no current role-playing chats. Do /roleplay create <name> to create a new one!");
+						sender.sendMessage(ChatColor.YELLOW + "There are currently no role-playing chats. Do " + ChatColor.GOLD + "/roleplay create <name>" + ChatColor.YELLOW + " to create a new one!");
 						return true;
 
 					}
@@ -130,7 +130,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 					RoleplayChat chat = roleplays.get(args[1]);
 
 					if (chat.isLocked()) {
-						sender.sendMessage(ChatColor.YELLOW + "This roleplay is locked! Ask " + chat.getCreator() + " if you wish to join!");
+						sender.sendMessage(ChatColor.YELLOW + "This roleplay is locked! Ask " + chat.getDisplayCreator() + " if you wish to join!");
 						return true;
 
 					}
@@ -139,9 +139,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 					chat.add(player.getUniqueId());
 
-					sender.sendMessage(ChatColor.YELLOW + "Enabled roleplay chat!");
-					sender.sendMessage(ChatColor.YELLOW + "Roleplayers will have a yellow chat. Their messages " + ChatColor.RED + "won't" + ChatColor.YELLOW + " be sent in global chat.");
-					sender.sendMessage(ChatColor.YELLOW + "To disable it, type /roleplay leave.");
+					sendRpJoinInfo(sender);
 
 					return true;
 
@@ -188,7 +186,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			if (subcmd.equals("create")) {
 
 					if (args.length != 2) {
-						sender.sendMessage(ChatColor.YELLOW + "You must specify the name of the role-play chat that you want to create! Usage: /roleplay create <name>");
+						sender.sendMessage(ChatColor.YELLOW + "You must specify the name of the role-play chat that you want to create! Usage: " + ChatColor.GOLD + "/roleplay create <name>");
 						return true;
 
 					}
@@ -218,6 +216,8 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 					sender.sendMessage(ChatColor.YELLOW + "Successfully created and added you to the new role-play chat, '" + args[1] + "'.");
 
+					sendRpJoinInfo(sender);
+
 					return true;
 
 			}
@@ -231,8 +231,8 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 					RoleplayChat chat = getChat(player.getUniqueId());
 
-					if (!chat.getCreator().equals(sender.getName())) {
-						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to lock the group.");
+					if (!chat.getCreator().equals(player.getUniqueId())) {
+						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getDisplayCreator() + ChatColor.YELLOW + " if you wish to lock the group.");
 						return true;
 
 					}
@@ -254,8 +254,8 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 					RoleplayChat chat = getChat(player.getUniqueId());
 
-					if (!chat.getCreator().equals(sender.getName())) {
-						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to unlock the group.");
+					if (!chat.getCreator().equals(player.getUniqueId())) {
+						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getDisplayCreator() + ChatColor.YELLOW + " if you wish to unlock the group.");
 						return true;
 
 					}
@@ -283,7 +283,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 					RoleplayChat chat = getChat(player.getUniqueId());
 
-					if (chat.getCreator() != sender.getName()) {
+					if (!chat.getCreator().equals(player.getUniqueId())) {
 						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to kick a player.");
 						return true;
 
@@ -348,7 +348,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			sender.sendMessage(ChatColor.YELLOW + "Usage: " + ChatColor.GOLD + "/roleplay <subcommand> <args>");
 			subcmds.send(sender);
 			joininfo.send(sender);
-			sender.sendMessage(ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\"");
+			sender.sendMessage(ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\")");
 
 		}
 
@@ -506,6 +506,14 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 					roleplays.remove(chat.getName());
 
 			}
+
+		}
+
+		public void sendRpJoinInfo(CommandSender sender) {
+
+			sender.sendMessage(ChatColor.YELLOW + " Enabled roleplay chat!");
+			sender.sendMessage(ChatColor.YELLOW + " Roleplayers will have a yellow chat. Their messages " + ChatColor.RED + "won't" + ChatColor.YELLOW + " be sent in global chat.");
+			sender.sendMessage(ChatColor.YELLOW + " To disable it, type /roleplay leave.");
 
 		}
 
