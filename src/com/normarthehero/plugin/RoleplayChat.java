@@ -108,7 +108,7 @@ public class RoleplayChat {
 
 			roleplayers.remove(uuid);
 
-			chatRaw(ChatColor.YELLOW + Bukkit.getPlayer(uuid).getDisplayName() + ChatColor.YELLOW + " has been kicked from the group.");
+			chatRaw(ChatColor.YELLOW + "Kicking " + Bukkit.getPlayer(uuid).getDisplayName() + ChatColor.YELLOW + "...");
 
 		}
 

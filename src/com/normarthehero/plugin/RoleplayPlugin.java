@@ -305,9 +305,9 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 					chat.kick(target.getUniqueId());
 
-					target.sendMessage(ChatColor.YELLOW + "You have been kicked from " + chat.getName() + ".");
+					clearPlayer(target.getUniqueId());
 
-					roleplayers.remove(target.getName());
+					target.sendMessage(ChatColor.YELLOW + "You have been kicked from " + chat.getName() + ".");
 
 					return true;
 
