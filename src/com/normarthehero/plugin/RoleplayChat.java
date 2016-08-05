@@ -68,6 +68,7 @@ public class RoleplayChat {
 			for (UUID uuid : roleplayers) {
 					s.append(Bukkit.getPlayer(uuid).getDisplayName());
 					s.append(" ");
+					s.append(ChatColor.YELLOW.toString());
 
 			}
 

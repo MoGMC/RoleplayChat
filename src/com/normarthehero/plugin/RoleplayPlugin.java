@@ -130,7 +130,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 					RoleplayChat chat = roleplays.get(args[1]);
 
 					if (chat.isLocked()) {
-						sender.sendMessage(ChatColor.YELLOW + "This roleplay is locked! Ask " + chat.getDisplayCreator() + " if you wish to join!");
+						sender.sendMessage(ChatColor.YELLOW + "This roleplay is locked! Ask " + chat.getDisplayCreator() + ChatColor.YELLOW + " if you wish to join!");
 						return true;
 
 					}
@@ -284,7 +284,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 					RoleplayChat chat = getChat(player.getUniqueId());
 
 					if (!chat.getCreator().equals(player.getUniqueId())) {
-						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getCreator() + " if you wish to kick a player.");
+						sender.sendMessage(ChatColor.YELLOW + "You aren't the creator of this chat! Ask " + chat.getDisplayCreator() + ChatColor.YELLOW + " if you wish to kick a player.");
 						return true;
 
 					}
