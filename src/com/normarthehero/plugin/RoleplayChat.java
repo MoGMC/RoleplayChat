@@ -100,6 +100,8 @@ public class RoleplayChat {
 		}
 
 		public void add(UUID uuid) {
+
+			chatRaw(ChatColor.YELLOW + Bukkit.getPlayer(uuid).getDisplayName() + ChatColor.YELLOW + " has joined the group.");
 			roleplayers.add(uuid);
 
 		}
