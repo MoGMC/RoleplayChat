@@ -9,8 +9,6 @@ import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import mkremins.fanciful.FancyMessage;
-
 public class RoleplayChat {
 
 		private HashSet<UUID> roleplayers = new HashSet<UUID>();

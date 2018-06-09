@@ -20,8 +20,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.monkeygamesmc.plugin.playerdata.PlayerData;
 import com.monkeygamesmc.plugin.playerdata.PlayerDataPlugin;
 
-import mkremins.fanciful.FancyMessage;
-
 public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		private HashMap<String, RoleplayChat> roleplays = new HashMap<String, RoleplayChat>();
