@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class RoleplayChat {
 
-	private HashSet<UUID> roleplayers = new HashSet<UUID> ();
+	private HashSet<UUID> roleplayers = new HashSet<> ();
 	private boolean locked = false;
 	private String rpname;
 	private final UUID CREATOR;
@@ -33,7 +33,7 @@ public class RoleplayChat {
 
 	}
 
-	public void chatRaw (String msg) {
+	void chatRaw (String msg) {
 
 		for (UUID uuid : roleplayers) {
 			Bukkit.getPlayer (uuid).sendMessage (msg);
@@ -42,7 +42,7 @@ public class RoleplayChat {
 
 	}
 
-	public void sendInfo (CommandSender.Spigot sender) {
+	void sendInfo (CommandSender.Spigot sender) {
 		StringBuilder s = new StringBuilder (ChatColor.YELLOW.toString ());
 		s.append (rpname);
 		s.append ("'s information:\n");
@@ -59,7 +59,7 @@ public class RoleplayChat {
 
 	}
 
-	public void sendInfoPlayers (CommandSender sender) {
+	void sendInfoPlayers (CommandSender sender) {
 		StringBuilder s = new StringBuilder (ChatColor.YELLOW.toString ());
 
 		s.append ("Players who are currently in \"");
@@ -77,17 +77,17 @@ public class RoleplayChat {
 
 	}
 
-	public boolean isLocked () {
+	boolean isLocked () {
 		return locked;
 
 	}
 
-	public UUID getCreator () {
+	UUID getCreator () {
 		return CREATOR;
 
 	}
 
-	public String getDisplayCreator () {
+	String getDisplayCreator () {
 
 		OfflinePlayer player = Bukkit.getOfflinePlayer (CREATOR);
 
@@ -102,14 +102,14 @@ public class RoleplayChat {
 
 	}
 
-	public void add (UUID uuid) {
+	void add (UUID uuid) {
 
 		chatRaw (ChatColor.YELLOW + Bukkit.getPlayer (uuid).getDisplayName () + ChatColor.YELLOW + " has joined the group.");
 		roleplayers.add (uuid);
 
 	}
 
-	public void kick (UUID uuid) {
+	void kick (UUID uuid) {
 
 		roleplayers.remove (uuid);
 
@@ -117,7 +117,7 @@ public class RoleplayChat {
 
 	}
 
-	public void remove (UUID uuid) {
+	void remove (UUID uuid) {
 
 		roleplayers.remove (uuid);
 
@@ -130,32 +130,32 @@ public class RoleplayChat {
 
 	}
 
-	public String getName () {
+	String getName () {
 		return rpname;
 
 	}
 
-	public void lock () {
+	void lock () {
 		locked = true;
 
 	}
 
-	public void unlock () {
+	void unlock () {
 		locked = false;
 
 	}
 
-	public boolean contains (UUID uuid) {
+	boolean contains (UUID uuid) {
 		return roleplayers.contains (uuid);
 
 	}
 
-	public void sendButton (CommandSender.Spigot sender) {
+	void sendButton (CommandSender.Spigot sender) {
 		sender.sendMessage (button);
 
 	}
 
-	public boolean isEmpty () {
+	boolean isEmpty () {
 		return roleplayers.isEmpty ();
 
 	}

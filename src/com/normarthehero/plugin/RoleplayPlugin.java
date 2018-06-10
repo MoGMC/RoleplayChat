@@ -25,15 +25,16 @@ import java.util.UUID;
 
 public class RoleplayPlugin extends JavaPlugin implements Listener {
 
-	private HashMap<String, RoleplayChat> roleplays = new HashMap<String, RoleplayChat> ();
-	private HashMap<UUID, String> roleplayers = new HashMap<UUID, String> ();
+	private HashMap<String, RoleplayChat> roleplays = new HashMap<> ();
+	private HashMap<UUID, String> roleplayers = new HashMap<> ();
 
-	private HashSet<UUID> spy = new HashSet<UUID> ();
+	private HashSet<UUID> spy = new HashSet<> ();
 
 	private PlayerDataPlugin database;
 
-	final String SPY_KEY = "rpchat.spy";
+	private final String SPY_KEY = "rpchat.spy";
 
+	@Override
 	public void onEnable () {
 
 		getServer ().getPluginManager ().registerEvents (this, this);
@@ -47,15 +48,13 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 	@Override
 	public boolean onCommand (CommandSender sender, Command command, String label, String[] args) {
 
-		if (!(sender instanceof Player)) {
-			return false;
-
-		}
+		if (!(sender instanceof Player)) return false;
 
 		CommandSender.Spigot sg = sender.spigot ();
 
 		// list all current rps
 		if (args.length < 1) {
+
 			sender.sendMessage (ChatColor.YELLOW + "Please specify your subcommand!");
 			usage (sender);
 			return true;
@@ -74,13 +73,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 			}
 
-			sender.sendMessage (ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
-
-			for (RoleplayChat chat : roleplays.values ()) {
-				chat.sendButton (sg);
-
-			}
-
+			listChats (sender);
 			return true;
 
 		}
@@ -104,13 +97,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 			if (args.length == 1) {
 
-				sender.sendMessage (ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
-
-				for (RoleplayChat chat : roleplays.values ()) {
-					chat.sendButton (sg);
-
-				}
-
+				listChats (sender);
 				return true;
 
 			}
@@ -120,12 +107,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			if (!roleplays.containsKey (args[1])) {
 
 				sender.sendMessage (ChatColor.YELLOW + "The chat '" + args[1] + "' does not exist.");
-				sender.sendMessage (ChatColor.YELLOW + "These are all the current role-playing chats. Click one to join!");
-
-				for (RoleplayChat chatlist : roleplays.values ()) {
-					chatlist.sendButton (sg);
-
-				}
+				listChats (sender);
 
 				return true;
 			}
@@ -150,10 +132,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		if (subcmd.equals ("leave")) {
 
-			if (!isInRp (player)) {
-				return true;
-
-			}
+			if (!isInRp (player)) return true;
 
 			clearPlayer (player.getUniqueId ());
 
@@ -165,10 +144,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		if (subcmd.equals ("info")) {
 
-			if (!isInRp (player)) {
-				return true;
-
-			}
+			if (!isInRp (player)) return true;
 
 			RoleplayChat chat = getChat (player.getUniqueId ());
 
@@ -200,12 +176,6 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 			}
 
-			if (args.length > 3) {
-				sender.sendMessage (ChatColor.YELLOW + "Sorry, but the name of your role-play chat can only be one word! (however, you could do 'unicorn_over_noodles' or something like that)");
-				return true;
-
-			}
-
 			if (roleplays.get (args[1]) != null) {
 				sender.sendMessage (ChatColor.YELLOW + "A chat with that name already exists!");
 				return true;
@@ -217,7 +187,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 			addRPer (player.getUniqueId (), newChat.getName ());
 			roleplays.put (newChat.getName (), newChat);
 
-			sender.sendMessage (ChatColor.YELLOW + "Successfully created and added you to the new role-play chat, '" + args[1] + "'.");
+			sender.sendMessage (ChatColor.YELLOW + "Successfully created and added you to the new role-play chat '" + args[1] + "'.");
 
 			sendRpJoinInfo (sender);
 
@@ -227,10 +197,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		if (subcmd.equals ("lock")) {
 
-			if (!isInRp (player)) {
-				return true;
-
-			}
+			if (!isInRp (player)) return true;
 
 			RoleplayChat chat = getChat (player.getUniqueId ());
 
@@ -250,10 +217,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		if (subcmd.equals ("unlock")) {
 
-			if (!isInRp (player)) {
-				return true;
-
-			}
+			if (!isInRp (player)) return true;
 
 			RoleplayChat chat = getChat (player.getUniqueId ());
 
@@ -344,35 +308,6 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
-	BaseComponent[] subcmds = new ComponentBuilder ("Available sub-commands: ").color (net.md_5.bungee.api.ChatColor.YELLOW)
-		.append ("info, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("gives info about the rp you're in (/rp info)"))
-		.append ("join, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("join a rp (/rp join <rp name>)"))
-		.append ("list, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("list all the current rps (/rp list)"))
-		.append ("create, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("creates a new rp (/rp create <rp name>)"))
-		.append ("leave, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("leaves the rp you're in (/rp leave)"))
-		.append ("kick, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("[owner tool] kicks someone from your rp (/rp kick <player>)"))
-		.append ("lock, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("[owner tool] locks your rp so no one can join (/rp lock)"))
-		.append ("unlock").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("[owner tool] unlocks your rp so people can join (/rp unlock)")).create ();
-
-	static HoverEvent tooltip (String tooltip) { return new HoverEvent (HoverEvent.Action.SHOW_TEXT, new ComponentBuilder (tooltip).create ()); }
-
-	static ClickEvent command (String command) { return new ClickEvent (ClickEvent.Action.RUN_COMMAND, command); }
-
-	BaseComponent[] joininfo = new ComponentBuilder ("Use ").color (net.md_5.bungee.api.ChatColor.YELLOW)
-		.append ("/roleplay join").color (net.md_5.bungee.api.ChatColor.RED).event (command ("/roleplay join")).event (tooltip ("clicking this will list all current chats."))
-		.append (" by itself to list/join chats.").color (net.md_5.bungee.api.ChatColor.YELLOW).create ();
-
-	public void usage (CommandSender sender) {
-
-		CommandSender.Spigot s = sender.spigot ();
-
-		sender.sendMessage (ChatColor.YELLOW + "Usage: " + ChatColor.GOLD + "/roleplay <subcommand> <args>");
-		s.sendMessage (subcmds);
-		s.sendMessage (joininfo);
-		sender.sendMessage (ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\")");
-
-	}
-
 	@EventHandler (priority = EventPriority.HIGH)
 	public void onChat (AsyncPlayerChatEvent e) {
 
@@ -385,10 +320,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 		// if the player isn't on the rp list
 		// this is basically the only reason for roleplayers list...
 		// TODO: think of a better way of seeing who's rping?
-		if (!roleplayers.containsKey (e.getPlayer ().getUniqueId ())) {
-			return;
-
-		}
+		if (!roleplayers.containsKey (e.getPlayer ().getUniqueId ())) return;
 
 		String oMsg = e.getMessage ();
 
@@ -415,22 +347,14 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 		// make the message and send it.
 
 		StringBuilder msgbuilder = new StringBuilder (ChatColor.YELLOW.toString ());
-		msgbuilder.append ("[");
-		msgbuilder.append (chat.getName ());
-		msgbuilder.append ("] ");
-		msgbuilder.append (e.getPlayer ().getDisplayName ());
-		msgbuilder.append (ChatColor.YELLOW.toString ());
-		msgbuilder.append (": ");
-		msgbuilder.append (oMsg);
+		msgbuilder.append ("["); msgbuilder.append (chat.getName ()); msgbuilder.append ("] ");
+		msgbuilder.append (e.getPlayer ().getDisplayName ()); msgbuilder.append (ChatColor.YELLOW.toString ()); msgbuilder.append (": "); msgbuilder.append (oMsg);
 
 		String msg = msgbuilder.toString ();
 
 		for (UUID uuid : spy) {
 
-			if (chat.contains (uuid)) {
-				continue;
-
-			}
+			if (chat.contains (uuid)) continue;
 
 			Bukkit.getPlayer (uuid).sendMessage (msg);
 
@@ -440,6 +364,10 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
+	void enableSpy (UUID uuid) { database.setData (uuid, SPY_KEY, "true"); spy.add (uuid); }
+
+	void disableSpy (UUID uuid) { database.unsetData (uuid, SPY_KEY); spy.remove (uuid); }
+
 	@EventHandler
 	public void onJoin (PlayerJoinEvent e) {
 
@@ -447,50 +375,7 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		PlayerData data = database.getPlayerData (e.getPlayer ().getUniqueId ());
 
-		if (data.isSet (SPY_KEY)) {
-			spy.add (e.getPlayer ().getUniqueId ());
-
-		}
-
-	}
-
-	// gets chat that player is in
-	public RoleplayChat getChat (UUID uuid) {
-		return roleplays.get (roleplayers.get (uuid));
-
-	}
-
-	public void addRPer (UUID uuid, String chat) {
-		roleplayers.put (uuid, chat);
-
-	}
-
-	boolean isInRp (Player player) {
-
-		if (roleplayers.containsKey (player.getUniqueId ())) {
-			return true;
-
-		}
-
-		player.sendMessage (ChatColor.YELLOW + "You aren't in a roleplaying chat!");
-
-		return false;
-
-	}
-
-	public void enableSpy (UUID uuid) {
-
-		database.setData (uuid, SPY_KEY, "true");
-
-		spy.add (uuid);
-
-	}
-
-	public void disableSpy (UUID uuid) {
-
-		database.unsetData (uuid, SPY_KEY);
-
-		spy.remove (uuid);
+		if (data.isSet (SPY_KEY)) spy.add (e.getPlayer ().getUniqueId ());
 
 	}
 
@@ -505,17 +390,66 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 	}
 
-	public void clearPlayer (UUID uuid) {
+	static HoverEvent tooltip (String tooltip) { return new HoverEvent (HoverEvent.Action.SHOW_TEXT, new ComponentBuilder (tooltip).create ()); }
+	static ClickEvent command (String command) { return new ClickEvent (ClickEvent.Action.RUN_COMMAND, command); }
 
-		if (roleplayers.containsKey (uuid)) {
+	BaseComponent[] subcmds = new ComponentBuilder ("Available sub-commands: ").color (net.md_5.bungee.api.ChatColor.YELLOW)
+		.append ("info, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("gives info about the rp you're in (/rp info)"))
+		.append ("join, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("join a rp (/rp join <rp name>)"))
+		.append ("list, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("list all the current rps (/rp list)"))
+		.append ("create, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("creates a new rp (/rp create <rp name>)"))
+		.append ("leave, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("leaves the rp you're in (/rp leave)"))
+		.append ("kick, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("[owner tool] kicks someone from your rp (/rp kick <player>)"))
+		.append ("lock, ").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("[owner tool] locks your rp so no one can join (/rp lock)"))
+		.append ("unlock").color (net.md_5.bungee.api.ChatColor.GOLD).event (tooltip ("[owner tool] unlocks your rp so people can join (/rp unlock)")).create ();
 
-			clearRoleplayer (uuid);
+	BaseComponent[] joininfo = new ComponentBuilder ("Use ").color (net.md_5.bungee.api.ChatColor.YELLOW)
+		.append ("/roleplay join").color (net.md_5.bungee.api.ChatColor.RED).event (command ("/roleplay join")).event (tooltip ("clicking this will list all current chats."))
+		.append (" by itself to list/join chats.").color (net.md_5.bungee.api.ChatColor.YELLOW).create ();
 
-		}
+	void usage (CommandSender sender) {
+
+		CommandSender.Spigot s = sender.spigot ();
+
+		sender.sendMessage (ChatColor.YELLOW + "Usage: " + ChatColor.GOLD + "/roleplay <subcommand> <args>");
+		s.sendMessage (subcmds);
+		s.sendMessage (joininfo);
+		sender.sendMessage (ChatColor.YELLOW + "Need to say something in global chat? Simply add a " + ChatColor.RED + "-g" + ChatColor.YELLOW + " at the beginning of your message. (example: \"-g hello!\")");
 
 	}
 
-	public void clearRoleplayer (UUID uuid) {
+	void listChats (CommandSender sender) {
+
+		CommandSender.Spigot s = sender.spigot ();
+
+		sender.sendMessage (ChatColor.YELLOW + "These are all the current roleplaying chats. Click one to join!");
+
+		for (RoleplayChat chat : roleplays.values ()) chat.sendButton (s);
+
+	}
+
+	boolean isInRp (Player player) {
+
+		if (roleplayers.containsKey (player.getUniqueId ())) return true;
+
+		player.sendMessage (ChatColor.YELLOW + "You aren't in a roleplaying chat!");
+
+		return false;
+
+	}
+
+	// gets chat that player is in
+	RoleplayChat getChat (UUID uuid) { return roleplays.get (roleplayers.get (uuid)); }
+
+	void addRPer (UUID uuid, String chat) { roleplayers.put (uuid, chat); }
+
+	void clearPlayer (UUID uuid) {
+
+		if (roleplayers.containsKey (uuid)) clearRoleplayer (uuid);
+
+	}
+
+	void clearRoleplayer (UUID uuid) {
 
 		RoleplayChat chat = getChat (uuid);
 
@@ -523,14 +457,11 @@ public class RoleplayPlugin extends JavaPlugin implements Listener {
 
 		roleplayers.remove (uuid);
 
-		if (chat.isEmpty ()) {
-			roleplays.remove (chat.getName ());
-
-		}
+		if (chat.isEmpty ()) roleplays.remove (chat.getName ());
 
 	}
 
-	public void sendRpJoinInfo (CommandSender sender) {
+	void sendRpJoinInfo (CommandSender sender) {
 
 		sender.sendMessage (ChatColor.YELLOW + " Enabled roleplay chat!");
 		sender.sendMessage (ChatColor.YELLOW + " Roleplayers will have a yellow chat. Their messages " + ChatColor.RED + "won't" + ChatColor.YELLOW + " be sent in global chat.");
