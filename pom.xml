@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.normarthehero</groupId>
 	<artifactId>RoleplayChat</artifactId>
-	<version>0.3</version>
+	<version>0.4</version>
 	<repositories>
 		<repository>
 			<id>spigot-repo</id>
@@ -12,8 +12,8 @@
 	</repositories>
 	<dependencies>
 		<dependency>
-			<groupId>org.bukkit</groupId>
-			<artifactId>bukkit</artifactId>
+			<groupId>org.spigotmc</groupId>
+			<artifactId>spigot-api</artifactId>
 			<version>1.12.2-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
